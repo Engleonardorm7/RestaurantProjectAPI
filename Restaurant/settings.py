@@ -150,8 +150,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',#para trabajar con el login de django
     ),
         "DEFAULT_THROTTLE_RATES":{
-            'anon':'2/minute',#limita el llamado de la api a 2 llamadas por minute/second or day personas no autenticadas
-            'user':'5/minute',#limita el llamado de la api a 5 llamadas por minute/second or day personas autenticadas
+            'anon':'10/minute',#limita el llamado de la api a 2 llamadas por minute/second or day personas no autenticadas
+            'user':'10/minute',#limita el llamado de la api a 5 llamadas por minute/second or day personas autenticadas
             'ten':'10/minute',
             },
     'DEFAULT_THROTTLE_CLASSES': [

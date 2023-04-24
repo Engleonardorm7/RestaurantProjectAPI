@@ -2,7 +2,7 @@ from rest_framework import generics, status
 from .models import CustomUser
 from .serializers import CustomUserSerializer
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated,BasePermission
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -11,9 +11,16 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db.models import Q
+from .models import Product
+from .serializers import ProductSerializer
+
+
 
 
 class CustomUserListCreateView(generics.ListCreateAPIView):
+    """
+    API View to create a user.
+    """
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = (AllowAny,)
@@ -32,11 +39,69 @@ class CustomUserListCreateView(generics.ListCreateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class UserDetailsView(APIView):
+    """
+    API view to see the current user or the list of users
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         serializer = CustomUserSerializer(request.user)
         return Response(serializer.data)
+
+#-----------------------------------Product----------------
+
+#La principal diferencia entre ListCreateAPIView y ListAPIView es que ListCreateAPIView proporciona la funcionalidad para crear nuevos objetos utilizando el método POST, además de obtener una lista de objetos utilizando el método GET, mientras que ListAPIView solo se utiliza para obtener una lista de recursos utilizando el método GET.
+
+class IsNotCustomerOrDeliveryCrew(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        return not (user.groups.filter(name__in=['Manager']).exists())
+
+
+
+class MenuItems(APIView):
+
+    permission_classes = [IsAuthenticated, IsNotCustomerOrDeliveryCrew]
+    # Aquí definimos los permisos de acceso a la vista
+
+    def get(self, request):
+        menu_items = Product.objects.all()
+        serializer = ProductSerializer(menu_items, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def put(self, request):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def patch(self, request):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def delete(self, request):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class ManagersView(APIView):
