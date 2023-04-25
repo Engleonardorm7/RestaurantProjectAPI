@@ -3,14 +3,15 @@ from .views import  ManagersView, MenuItems#UserDetailsView,
 
 # from .views import CustomUserListCreateView
 
-#from .views import MenuItemListView, MenuItemDetailView
+from .views import MenuItemDetailView
 urlpatterns = [
     
     path('', include('djoser.urls')),
     path('users/users/me/', include('djoser.urls.authtoken')),
+
     path('groups/manager/users/', ManagersView.as_view(), name='manager-view'),
     #path('menu-items/', MenuItemsList.as_view(), name='menu-items'),
     path('menu-items/', MenuItems.as_view(), name='menu-items'),
     # path('menu-items/', MenuItemListView.as_view(), name='menuitem-list'),
-    # path('menu-items/<int:pk>/', MenuItemDetailView.as_view(), name='menuitem-detail'),
+    path('menu-items/<int:pk>/', MenuItemDetailView.as_view(), name='menuitem-detail'),
 ]

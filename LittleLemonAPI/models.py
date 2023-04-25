@@ -9,57 +9,26 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
 
+# class ManagersView(generics.GenericAPIView):
+#     permission_classes = [IsAdminUser]
 
-# class CustomUser(AbstractUser):
-#     """
-#     Model class for Custom User.
-#     """
-#     username=models.CharField(("Username"), max_length=200, unique=True)
-#     email=models.EmailField(("Email"), max_length=254, unique=True)
-#     USERNAME_FIELD='username'
-#     REQUIRED_FIELDS=['username','email']
-#     # is_delivery_crew=models.BooleanField(("Delivery crew"),default=False)
-#     # is_manager=models.BooleanField(("Manager"),default=False)
+#     def post(self, request, *args, **kwargs):
+#         username = request.data.get('username')
+#         if username:
+#             user = get_object_or_404(User, username=username)
+#             managers = Group.objects.get(name="Manager")
+#             managers.user_set.add(user)
+#             return Response({"message": f"ok {user} added to the group"})
+#         return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
-#     groups = models.ManyToManyField(
-#         'auth.Group',
-#         verbose_name=('groups'),
-#         blank=True,
-#         help_text=('The groups this user belongs to. A user will '
-#                    'get all permissions granted to each of '
-#                    'their groups.'),
-#         related_name='customuser_set',
-#         related_query_name='user'
-#     )
-#     user_permissions = models.ManyToManyField(
-#         'auth.Permission',
-#         verbose_name=('user permissions'),
-#         blank=True,
-#         help_text=('Specific permissions for this user.'),
-#         related_name='customuser_set',
-#         related_query_name='user'
-#     )
-
-class ManagersView(generics.GenericAPIView):
-    permission_classes = [IsAdminUser]
-
-    def post(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        if username:
-            user = get_object_or_404(User, username=username)
-            managers = Group.objects.get(name="Manager")
-            managers.user_set.add(user)
-            return Response({"message": f"ok {user} added to the group"})
-        return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        if username:
-            user = get_object_or_404(User, username=username)
-            managers = Group.objects.get(name="Manager")
-            managers.user_set.remove(user)
-            return Response({"message": f"ok {user} removed from the group"})
-        return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+#     def delete(self, request, *args, **kwargs):
+#         username = request.data.get('username')
+#         if username:
+#             user = get_object_or_404(User, username=username)
+#             managers = Group.objects.get(name="Manager")
+#             managers.user_set.remove(user)
+#             return Response({"message": f"ok {user} removed from the group"})
+#         return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 class Category(models.Model):
     title=models.CharField(("Title"), max_length=100,unique=True)
@@ -74,7 +43,7 @@ class Product(models.Model):
     """
     title=models.CharField(("Title"), max_length=255)
     description=models.CharField(("Description"), max_length=255)
-    price=models.DecimalField(("Price"), max_digits=6, decimal_places=2)
+    price=models.DecimalField(("Price"), max_digits=8, decimal_places=2)
     image=models.ImageField(("image"), upload_to='LittleLemon/images', height_field=None, width_field=None, max_length=None)
     inventory=models.SmallIntegerField(("Inventory"))
     category=models.ForeignKey(Category, on_delete=models.PROTECT, default=1)

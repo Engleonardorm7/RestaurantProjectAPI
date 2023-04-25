@@ -11,10 +11,10 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import Product
+from .models import Product, Category
 from .serializers import ProductSerializer
 
-
+from django.contrib.auth.decorators import user_passes_test
 
 
 # class CustomUserListCreateView(generics.ListCreateAPIView):
@@ -52,24 +52,28 @@ from .serializers import ProductSerializer
 
 #La principal diferencia entre ListCreateAPIView y ListAPIView es que ListCreateAPIView proporciona la funcionalidad para crear nuevos objetos utilizando el método POST, además de obtener una lista de objetos utilizando el método GET, mientras que ListAPIView solo se utiliza para obtener una lista de recursos utilizando el método GET.
 
-class IsNotCustomerOrDeliveryCrew(BasePermission):
-    def has_permission(self, request, view):
-        user = request.user
-        return not (user.groups.filter(name__in=['Manager']).exists())
-
 
 
 class MenuItems(APIView):
-
-    permission_classes = [IsAuthenticated, IsNotCustomerOrDeliveryCrew]
-    # Aquí definimos los permisos de acceso a la vista
-
+    """
+#     API View to see, edit, create or delete items.
+#     """
+    permission_classes = [IsAuthenticated]
+    
+    def is_manager(self, user):
+        return user.groups.filter(name='Manager').exists()
+    
     def get(self, request):
         menu_items = Product.objects.all()
         serializer = ProductSerializer(menu_items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        if self.is_manager(self.request.user):
+            serialized_item=ProductSerializer(data=request.data)
+            serialized_item.is_valid(raise_exception=True)
+            serialized_item.save()
+            return Response({'mensaje': f'Product {ProductSerializer.fields__title} Created'},status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     def put(self, request):
@@ -82,7 +86,8 @@ class MenuItems(APIView):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
 
-
+class MenuItemDetailView(APIView):
+    pass
 
 
 
