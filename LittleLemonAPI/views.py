@@ -74,16 +74,16 @@ class MenuItems(APIView):
             serialized_item.is_valid(raise_exception=True)
             serialized_item.save()
             return Response({'mensaje': f'Product {ProductSerializer.fields__title} Created'},status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_403_FORBIDDEN)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
     def put(self, request):
-        return Response(status=status.HTTP_403_FORBIDDEN)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
     def patch(self, request):
-        return Response(status=status.HTTP_403_FORBIDDEN)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request):
-        return Response(status=status.HTTP_403_FORBIDDEN)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
 
 class MenuItemDetailView(APIView):
