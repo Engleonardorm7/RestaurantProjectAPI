@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from .models import CustomUser, Category, OrderItem, Order, Product
+from .models import  Category, OrderItem, Order, Product #CustomUser,
 
-class CustomUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=CustomUser
+# class CustomUserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model=CustomUser
         
-        fields = ['id', 'username', 'email','password']#, 'is_delivery_crew', 'is_manager'
-        extra_kwargs = {'password': {'write_only': True}}
+#         fields = ['id', 'username', 'email','password']#, 'is_delivery_crew', 'is_manager'
+#         extra_kwargs = {'password': {'write_only': True}}
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

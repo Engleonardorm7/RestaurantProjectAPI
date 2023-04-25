@@ -1,6 +1,6 @@
 from rest_framework import generics, status
-from .models import CustomUser
-from .serializers import CustomUserSerializer
+# from .models import CustomUser
+# from .serializers import CustomUserSerializer
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated,BasePermission
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -17,36 +17,36 @@ from .serializers import ProductSerializer
 
 
 
-class CustomUserListCreateView(generics.ListCreateAPIView):
-    """
-    API View to create a user.
-    """
-    queryset = CustomUser.objects.all()
-    serializer_class = CustomUserSerializer
-    permission_classes = (AllowAny,)
+# class CustomUserListCreateView(generics.ListCreateAPIView):
+#     """
+#     API View to create a user.
+#     """
+#     queryset = CustomUser.objects.all()
+#     serializer_class = CustomUserSerializer
+#     permission_classes = (AllowAny,)
 
-    def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            username = serializer.validated_data.get('username')
-            email = serializer.validated_data.get('email')
-            if not CustomUser.objects.filter(Q(username=username) | Q(email=email)).exists():
-                serializer.save()
-                return Response({'message': f'User {username} created successfully.'}, status=status.HTTP_201_CREATED)
-            else:
-                return Response({'error': 'User with that username or email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     def post(self, request):
+#         serializer = self.get_serializer(data=request.data)
+#         if serializer.is_valid():
+#             username = serializer.validated_data.get('username')
+#             email = serializer.validated_data.get('email')
+#             if not CustomUser.objects.filter(Q(username=username) | Q(email=email)).exists():
+#                 serializer.save()
+#                 return Response({'message': f'User {username} created successfully.'}, status=status.HTTP_201_CREATED)
+#             else:
+#                 return Response({'error': 'User with that username or email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class UserDetailsView(APIView):
-    """
-    API view to see the current user or the list of users
-    """
-    permission_classes = [IsAuthenticated]
+# class UserDetailsView(APIView):
+#     """
+#     API view to see the current user or the list of users
+#     """
+#     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        serializer = CustomUserSerializer(request.user)
-        return Response(serializer.data)
+#     def get(self, request):
+#         serializer = CustomUserSerializer(request.user)
+#         return Response(serializer.data)
 
 #-----------------------------------Product----------------
 

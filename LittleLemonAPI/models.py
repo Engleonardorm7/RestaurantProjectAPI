@@ -10,35 +10,35 @@ from rest_framework.response import Response
 
 
 
-class CustomUser(AbstractUser):
-    """
-    Model class for Custom User.
-    """
-    username=models.CharField(("Username"), max_length=200, unique=True)
-    email=models.EmailField(("Email"), max_length=254, unique=True)
-    USERNAME_FIELD='username'
-    REQUIRED_FIELDS=['username','email']
-    # is_delivery_crew=models.BooleanField(("Delivery crew"),default=False)
-    # is_manager=models.BooleanField(("Manager"),default=False)
+# class CustomUser(AbstractUser):
+#     """
+#     Model class for Custom User.
+#     """
+#     username=models.CharField(("Username"), max_length=200, unique=True)
+#     email=models.EmailField(("Email"), max_length=254, unique=True)
+#     USERNAME_FIELD='username'
+#     REQUIRED_FIELDS=['username','email']
+#     # is_delivery_crew=models.BooleanField(("Delivery crew"),default=False)
+#     # is_manager=models.BooleanField(("Manager"),default=False)
 
-    groups = models.ManyToManyField(
-        'auth.Group',
-        verbose_name=('groups'),
-        blank=True,
-        help_text=('The groups this user belongs to. A user will '
-                   'get all permissions granted to each of '
-                   'their groups.'),
-        related_name='customuser_set',
-        related_query_name='user'
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        verbose_name=('user permissions'),
-        blank=True,
-        help_text=('Specific permissions for this user.'),
-        related_name='customuser_set',
-        related_query_name='user'
-    )
+#     groups = models.ManyToManyField(
+#         'auth.Group',
+#         verbose_name=('groups'),
+#         blank=True,
+#         help_text=('The groups this user belongs to. A user will '
+#                    'get all permissions granted to each of '
+#                    'their groups.'),
+#         related_name='customuser_set',
+#         related_query_name='user'
+#     )
+#     user_permissions = models.ManyToManyField(
+#         'auth.Permission',
+#         verbose_name=('user permissions'),
+#         blank=True,
+#         help_text=('Specific permissions for this user.'),
+#         related_name='customuser_set',
+#         related_query_name='user'
+#     )
 
 class ManagersView(generics.GenericAPIView):
     permission_classes = [IsAdminUser]
