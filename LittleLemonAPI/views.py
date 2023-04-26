@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db.models import Q
 from .models import Product, Category
-from .serializers import ProductSerializer
+from .serializers import ProductSerializer,CategorySerializer
 
 from django.contrib.auth.decorators import user_passes_test
 
@@ -56,19 +56,58 @@ from django.contrib.auth.decorators import user_passes_test
 
 class MenuItems(APIView):
     """
-#     API View to see, edit, create or delete items.
-#     """
+    API View to see, edit, create or delete items.
+
+    GET:
+    Returns a list of all menu items.
+
+    POST:
+    Creates a new menu item.
+
+    PUT:
+    Updates an existing menu item.
+
+    PATCH:
+    Partially updates an existing menu item.
+
+    DELETE:
+    Deletes an existing menu item.
+    """
     permission_classes = [IsAuthenticated]
     
     def is_manager(self, user):
+        """
+        Check if the user is a Manager.
+
+        Parameters:
+        user (User): The user instance to check.
+
+        Returns:
+        bool: True if the user is a Manager, False otherwise.
+        """
         return user.groups.filter(name='Manager').exists()
     
     def get(self, request):
+        """
+        Returns a list of all menu items.
+
+        Returns:
+        Response: A response with serialized menu items.
+        """
         menu_items = Product.objects.all()
         serializer = ProductSerializer(menu_items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        """
+        Creates a new menu item.
+
+        Parameters:
+        request (Request): The HTTP request object.
+
+        Returns:
+        Response: A response with the created menu item data.
+        """
         if self.is_manager(self.request.user):
             serialized_item=ProductSerializer(data=request.data)
             serialized_item.is_valid(raise_exception=True)
@@ -76,18 +115,108 @@ class MenuItems(APIView):
             return Response({'mensaje': f'Product {ProductSerializer.fields__title} Created'},status=status.HTTP_201_CREATED)
         return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
-    def put(self, request):
+    def put(self, request, pk):
+        if self.is_manager(self.request.user):
+            item=self.get_object(pk)
+            serialized_item=ProductSerializer(item,data=request.data)
+            serialized_item.is_valid(raise_exception=True)
+            serialized_item.save()
+            return Response({'mensaje':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
+
         return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
-    def patch(self, request):
+    def patch(self, request, pk):
+        if self.is_manager(self.request.user):
+            item=self.get_object(pk)
+            serialized_item=ProductSerializer(item, data=request.data, partial=True)
+            serialized_item.is_valid(raise_exception=True)
+            serialized_item.save()
+            return Response({'mensage':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
+
         return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
-    def delete(self, request):
+    def delete(self, request, pk):
+        if self.is_manager(self.request.user):
+            item=self.get_object(pk)
+            item.delete()
+            return Response({'mensaje': f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
         return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
-
+    # def get_object(self, request, pk):
+    #     try:
+    #         return Product.objects.get(pk=pk)
+    #     except Product.DoesNotExist:
+    #         raise status.HTTP_404_NOT_FOUND
+        
 class MenuItemDetailView(APIView):
-    pass
+
+    """
+    API View to view, edit, create or delete a specific item.
+
+    GET:
+    Return a serialized representation of a specific item.
+
+    PUT:
+    Update a specific item with the provided data.
+
+    PATCH:
+    Partially update a specific item with the provided data.
+
+    DELETE:
+    Delete a specific item.
+
+    Permission Classes:
+    - IsAuthenticated: Allow access only to authenticated users.
+    - IsManager: Allow access only to users belonging to the 'Manager' group.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def is_manager(self, user):
+        return user.groups.filter(name='Manager').exists()
+    
+    def get(self, request, pk):
+        item=get_object_or_404(Product,pk=pk)
+        serialized_item=ProductSerializer(item)
+        return Response(serialized_item.data)
+
+    def put(self, request, pk):
+        """Update a specific item with the provided data."""
+        if self.is_manager(self.request.user):
+            item=get_object_or_404(Product,pk=pk)
+            serialized_item=ProductSerializer(item,data=request.data)
+            serialized_item.is_valid(raise_exception=True)
+            serialized_item.save()
+            return Response({'mensaje':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
+
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
+
+    def patch(self, request, pk):
+        """Partially update a specific item with the provided data."""
+        if self.is_manager(self.request.user):
+            item=get_object_or_404(Product,pk=pk)
+            serialized_item=ProductSerializer(item, data=request.data, partial=True)
+            serialized_item.is_valid(raise_exception=True)
+            serialized_item.save()
+            return Response({'mensage':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
+
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
+
+    def delete(self, request, pk):
+        """
+        Deletes an existing menu item.
+
+        Parameters:
+        request (Request): The HTTP request object.
+        pk (int): The ID of the menu item to delete.
+
+        Returns:
+        Response: A response with a success message.
+        """
+        if self.is_manager(self.request.user):
+            item=get_object_or_404(Product,pk=pk)
+            item.delete()
+            return Response({'mensaje': f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
 
 

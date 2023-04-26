@@ -1,9 +1,8 @@
 from django.urls import path, include
-from .views import  ManagersView, MenuItems#UserDetailsView,
-
+from .views import  ManagersView, MenuItems, MenuItemDetailView
 # from .views import CustomUserListCreateView
 
-from .views import MenuItemDetailView
+
 urlpatterns = [
     
     path('', include('djoser.urls')),
