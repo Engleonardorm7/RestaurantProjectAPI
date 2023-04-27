@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import  Category, OrderItem, Order, Product #CustomUser,
+from .models import  Category, OrderItem, Order, Product, User #CustomUser,
 
 # class CustomUserSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -32,3 +32,9 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model=Order
         fields = ['id', 'user', 'created_at', 'updated_at', 'is_ordered', 'total_price', 'items']
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email')

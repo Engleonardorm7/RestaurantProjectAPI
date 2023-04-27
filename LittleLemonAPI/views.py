@@ -219,7 +219,17 @@ class MenuItemDetailView(APIView):
         return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
 
-
+class Managers(APIView):
+    
+    def is_manager(self, user):
+        return user.groups.filter(name='Manager').exists()
+    
+    def get(self, request):
+        managers = Group.objects.get(name='Manager') # Obtenemos el grupo Manager
+        manager_users = managers.user_set.all() # Obtenemos todos los usuarios del grupo
+        # Creamos una lista de diccionarios con información de cada usuario para serializar en la respuesta
+        users_info = [{'username': user.username, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name} for user in manager_users]
+        return Response(users_info)
 
 
 

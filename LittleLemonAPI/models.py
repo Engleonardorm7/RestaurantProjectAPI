@@ -9,17 +9,18 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
 
-# class ManagersView(generics.GenericAPIView):
-#     permission_classes = [IsAdminUser]
+class ManagersView(generics.GenericAPIView):
+    permission_classes = [IsAdminUser]
 
-#     def post(self, request, *args, **kwargs):
-#         username = request.data.get('username')
-#         if username:
-#             user = get_object_or_404(User, username=username)
-#             managers = Group.objects.get(name="Manager")
-#             managers.user_set.add(user)
-#             return Response({"message": f"ok {user} added to the group"})
-#         return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        if username:
+            user = get_object_or_404(User, username=username)
+            managers = Group.objects.get(name="Manager")
+            managers.user_set.add(user)
+            return Response({"message": f"ok {user} added to the group"})
+        return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 #     def delete(self, request, *args, **kwargs):
 #         username = request.data.get('username')
