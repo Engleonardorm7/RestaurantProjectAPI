@@ -220,28 +220,62 @@ class MenuItemDetailView(APIView):
 
 
 class Managers(APIView):
-    
+
+    permission_classes = [IsAuthenticated]
+
     def is_manager(self, user):
         return user.groups.filter(name='Manager').exists()
     
     def get(self, request):
-        managers = Group.objects.get(name='Manager') # Obtenemos el grupo Manager
-        manager_users = managers.user_set.all() # Obtenemos todos los usuarios del grupo
-        # Creamos una lista de diccionarios con información de cada usuario para serializar en la respuesta
-        users_info = [{'username': user.username, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name} for user in manager_users]
-        return Response(users_info)
+        if self.is_manager(self.request.user):
+            managers = Group.objects.get(name='Manager') # Obtenemos el grupo Manager
+            manager_users = managers.user_set.all() # Obtenemos todos los usuarios del grupo
+            users_info = [{'username': user.username, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name} for user in manager_users]
+            return Response(users_info)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
+    
+    def post(self, request):
+        if self.is_manager(self.request.user):
+            username = request.data.get('username', None)
+            if username:
+                user = get_object_or_404(User, username=username)
+                managers = Group.objects.get(name="Manager")
+                managers.user_set.add(user)
+                return Response({"message":f"ok {user} added to the group"}, status=status.HTTP_201_CREATED)
+            return Response({'message':'The user does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
+
+
+#Delete by username
+    def delete(self,request):
+        if self.is_manager(self.request.user):
+            username=request.data.get('username', None)
+            if username:
+                user=get_object_or_404(User,username=username)
+                managers=Group.objects.get(name="Manager")
+                managers.user_set.remove(user)
+                return Response({"message":f"ok {user} deleted from the group"})
+            return Response({'message':'The user does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
 
 
+# #delete by ID
+# class ManagerSingleView(APIView):
+
+#     permission_classes = [IsAuthenticated]
+
+#     def is_manager(self, user):
+#         return user.groups.filter(name='Manager').exists()
+    
+#     def get(self, request, id):
+#         if self.is_manager(self.request.user):
+#             manager=get_object_or_404(User, id=id)
+#         return Response(manager.data)
 
 
-
-
-
-
-
-
-
+class DeliveryCrewView(APIView):
+    pass
 
 
 
