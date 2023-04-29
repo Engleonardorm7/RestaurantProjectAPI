@@ -11,8 +11,8 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import Product, Category
-from .serializers import ProductSerializer,CategorySerializer
+from .models import Product, Cart
+from .serializers import ProductSerializer,CartSerializer,OrderSerializer,OrderItemSerializer
 
 from django.contrib.auth.decorators import user_passes_test
 
@@ -310,7 +310,6 @@ class DeleteDeliveryCrewView(APIView):
         if self.is_manager(self.request.user):
             user=get_object_or_404(User,pk=pk)
             if user:
-                
                 delivery_crew=Group.objects.get(name='Delivery crew')
                 delivery_crew.user_set.remove(user)
                 return Response({"message":f"ok {user} deleted from the Delivery group"})
@@ -320,28 +319,40 @@ class DeleteDeliveryCrewView(APIView):
 
 
 class CartView(APIView):
-    pass
-
-
-class ManagersView(APIView):
-    permission_classes = [IsAdminUser]
-
-    def post(self, request, format=None):
-        username = request.data.get('username', None)
-        if username:
-            user = get_object_or_404(User, username=username)
-            managers = Group.objects.get(name="Manager")
-            managers.user_set.add(user)
-            return Response({"message":f"ok {user} added to the group"})
-        return Response({'message':'error'}, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, format=None):
-        username = request.data.get('username', None)
-        if username:
-            user = get_object_or_404(User, username=username)
-            managers = Group.objects.get(name="Manager")
-            managers.user_set.remove(user)
-            return Response({"message":f"ok {user} removed from the group"})
-        return Response({'message':'error'}, status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = [IsAuthenticated]
+    """
+        API endpoint that allows customers to get, add or delete menu items from their cart.
+    """
+    serializer_class = CartSerializer
+    def get(self, request):
+        user=request.user
+        cart_items=Cart.objects.filter(user=user)
+        serializer=self.serializer_class(cart_items,many=True)
+        return Response(serializer.data)
     
+    def post(self, request):
+        pass
+
+    def delete(self, request):
+        pass
+
+
+# def post(self, request, *args, **kwargs):
+#         user = request.user
+#         menuitem_id = request.data.get('menuitem_id')
+#         quantity = request.data.get('quantity')
+
+#         # Create cart item
+#         try:
+#             cart_item = Cart.objects.create(user=user, menuitem_id=menuitem_id, quantity=quantity)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+#         serializer = self.serializer_class(cart_item)
+#         return Response(serializer.data)
+
+#     def delete(self, request, *args, **kwargs):
+#         user = request.user
+#         Cart.objects.filter(user=user).delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
     

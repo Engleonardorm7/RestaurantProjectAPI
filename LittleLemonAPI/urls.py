@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import  ManagersView, MenuItems, MenuItemDetailView,Managers,DeliveryCrewView,DeleteDeliveryCrewView,CartView #ManagerSingleView
+from .views import  MenuItems, MenuItemDetailView,Managers,DeliveryCrewView,DeleteDeliveryCrewView,CartView #ManagerSingleView
 # from .views import CustomUserListCreateView
 
 

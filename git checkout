@@ -1,0 +1,72 @@
+[33mcommit c082e8ae31e3420f36f2c2a74a9f9f2ba1fbdc25[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Fri Apr 28 22:08:24 2023 -0500
+
+    now we are able to add users to the delivery crew group, list all the members or delete a member by its id
+
+[33mcommit 2a5f330876fdc1268eb530136df4028ce773e75c[m
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Thu Apr 27 22:20:35 2023 -0500
+
+    manager/users/ endpoints added. Now managers can use the methodes get post and delete. To delete a user from the manager's group you have to send the name of the user to be removed
+
+[33mcommit 118a1b6219a80d71fad576318a96f2dd1b0b9b92[m
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Wed Apr 26 21:44:56 2023 -0500
+
+    endpoint managers/users/ added, now you are able to see all the members of gre group Manager
+
+[33mcommit 054244a98ed291a13f2ba01593d5a1d5fe552090[m
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Tue Apr 25 22:22:40 2023 -0500
+
+    menu-items endpoint views finished
+
+[33mcommit 6b62bb3ff58058a4c9abfc69812c40edf77b8494[m
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Tue Apr 25 08:50:19 2023 -0500
+
+    starting single view items
+
+[33mcommit c35a0643f02e43e7a1c236b371ad604949b48b50[m
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Mon Apr 24 22:25:43 2023 -0500
+
+    now the API is able to create users and products
+
+[33mcommit 5938644d06f177a4c3121effc133256c9ee87cab[m
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Mon Apr 24 20:58:21 2023 -0500
+
+    The views were changed to the views provided by djoser for authentication
+
+[33mcommit 1b3ef312c589289db0f02d921e6802fec2be4a53[m
+Merge: ff6e31c df53237
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Sun Apr 23 19:42:05 2023 -0500
+
+    menu-items/ endpoint created with the respective view
+
+[33mcommit ff6e31c940378bb1e3acb66b00ccb4c77005c606[m
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Sun Apr 23 19:39:21 2023 -0500
+
+    menu-items/ endpoint created with the respective view
+
+[33mcommit df532377d3f0e308768bdb320ee25fb1ca3259f5[m
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Sun Apr 23 02:18:23 2023 -0500
+
+    Update settings.py
+
+[33mcommit ff1549d67e7c33965c892e88282032a68311a086[m
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Sun Apr 23 02:17:13 2023 -0500
+
+    adding gitignore
+
+[33mcommit 73fd51a2137ef69fd16dd27fdc71ac8ca7e0b634[m
+Author: Leonardo Rodriguez <leonardorm7@hotmail.com>
+Date:   Sun Apr 23 02:14:01 2023 -0500
+
+    adding project, models, serializers, some views and some urls already done

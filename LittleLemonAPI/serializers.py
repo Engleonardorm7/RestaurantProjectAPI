@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import  Category, OrderItem, Order, Product, User #CustomUser,
+from .models import  Category, OrderItem, Order, Product, User, Cart #CustomUser,
 
 # class CustomUserSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -19,22 +19,21 @@ class ProductSerializer(serializers.ModelSerializer):
         model=Product
         fields=['id','title','description','price','image','inventory','category']
 
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = ['id', 'user', 'menuitem','quantity', 'unit_price', 'price']
+
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=Order
+        fields = ['id', 'user', 'delivery_crew', 'status', 'total', 'date']
+
 class OrderItemSerializer(serializers.ModelSerializer):
-    product=ProductSerializer()
 
     class Meta:
         model=OrderItem
-        fields=['id','product','quantity','price']
-
-class OrderSerializer(serializers.ModelSerializer):
-    items=OrderItemSerializer(many=True)
-
-    class Meta:
-        model=Order
-        fields = ['id', 'user', 'created_at', 'updated_at', 'is_ordered', 'total_price', 'items']
-
-class UserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email')
+        fields = ['id', 'order', 'menuitem', 'quantity', 'unit_price', 'price']
