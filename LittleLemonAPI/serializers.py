@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import  Category, OrderItem, Order, Product, User #CustomUser,
+from .models import  Category, Cart, Order, MenuItem, OrderItem #CustomUser,
 
 # class CustomUserSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -13,28 +13,44 @@ class CategorySerializer(serializers.ModelSerializer):
         model=Category
         fields=['id','title']
 
-class ProductSerializer(serializers.ModelSerializer):
+class MenuItemSerializer(serializers.ModelSerializer):
     category=CategorySerializer()
     class Meta:
-        model=Product
-        fields=['id','title','description','price','image','inventory','category']
+        model=MenuItem
+        fields=['id','title','price','featured','category']
 
-class OrderItemSerializer(serializers.ModelSerializer):
-    product=ProductSerializer()
 
+class CartSerializer(serializers.ModelSerializer):
     class Meta:
-        model=OrderItem
-        fields=['id','product','quantity','price']
+        model = Cart
+        fields = ['id', 'user', 'menuitem', 'quantity', 'unit_price', 'price']
 
 class OrderSerializer(serializers.ModelSerializer):
-    items=OrderItemSerializer(many=True)
-
     class Meta:
-        model=Order
-        fields = ['id', 'user', 'created_at', 'updated_at', 'is_ordered', 'total_price', 'items']
+        model = Order
+        fields = ['id', 'user', 'delivery_crew', 'status', 'total', 'date']
 
-class UserSerializer(serializers.ModelSerializer):
-
+class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ('id', 'username', 'email')
+        model = OrderItem
+        fields = ['id', 'order', 'menuitem', 'quantity', 'unit_price', 'price']
+
+# class OrderItemSerializer(serializers.ModelSerializer):
+#     product=ProductSerializer()
+
+#     class Meta:
+#         model=OrderItem
+#         fields=['id','product','quantity','price']
+
+# class OrderSerializer(serializers.ModelSerializer):
+#     items=OrderItemSerializer(many=True)
+
+#     class Meta:
+#         model=Order
+#         fields = ['id', 'user', 'created_at', 'updated_at', 'is_ordered', 'total_price', 'items']
+
+# class UserSerializer(serializers.ModelSerializer):
+
+#     class Meta:
+#         model = User
+#         fields = ('id', 'username', 'email')
