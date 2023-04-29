@@ -230,7 +230,7 @@ class Managers(APIView):
         if self.is_manager(self.request.user):
             managers = Group.objects.get(name='Manager') # Obtenemos el grupo Manager
             manager_users = managers.user_set.all() # Obtenemos todos los usuarios del grupo
-            users_info = [{'username': user.username, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name} for user in manager_users]
+            users_info = [{'id':user.id,'username': user.username, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name} for user in manager_users]
             return Response(users_info)
         return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
     
@@ -275,11 +275,52 @@ class Managers(APIView):
 
 
 class DeliveryCrewView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def is_manager(self,user):
+        return user.groups.filter(name="Manager").exists()
+    
+    def get(self,request):
+        if self.is_manager(self.request.user):
+            delivery=Group.objects.get(name="Delivery crew")
+            delivery_crew=delivery.user_set.all()
+            delivery_crew_info=[{'id':user.id,'username': user.username, 'email': user.email, 'first_name': user.first_name, 'last_name': user.last_name} for user in delivery_crew]  
+            return Response(delivery_crew_info)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
+    
+    def post(self,request):
+        if self.is_manager(self.request.user):
+            username=request.data.get("username",None)
+            if username:
+                user=get_object_or_404(User,username=username)
+                delivery_crew=Group.objects.get(name='Delivery crew')
+                delivery_crew.user_set.add(user)
+                return Response({"message":f"ok {user} added to the Delivery group"}, status=status.HTTP_201_CREATED)
+            return Response({'message':'The user does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
+
+
+class DeleteDeliveryCrewView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def is_manager(self,user):
+        return user.groups.filter(name="Manager").exists()
+    
+    def delete(self,request,pk):
+        if self.is_manager(self.request.user):
+            user=get_object_or_404(User,pk=pk)
+            if user:
+                
+                delivery_crew=Group.objects.get(name='Delivery crew')
+                delivery_crew.user_set.remove(user)
+                return Response({"message":f"ok {user} deleted from the Delivery group"})
+            return Response({'message':'The user does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
+
+
+
+class CartView(APIView):
     pass
-
-
-
-
 
 
 class ManagersView(APIView):
@@ -302,3 +343,5 @@ class ManagersView(APIView):
             managers.user_set.remove(user)
             return Response({"message":f"ok {user} removed from the group"})
         return Response({'message':'error'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
