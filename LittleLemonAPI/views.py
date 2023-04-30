@@ -11,8 +11,8 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db.models import Q
-from .models import MenuItem, Cart
-from .serializers import MenuItemSerializer,CartSerializer
+from .models import MenuItem, Cart,Order,OrderItem
+from .serializers import MenuItemSerializer,CartSerializer,OrderSerializer,OrderItemSerializer
 
 import decimal
 
@@ -289,7 +289,7 @@ class DeleteDeliveryCrewView(APIView):
 
 class CartView(APIView):
     permission_classes = [IsAuthenticated]
-    
+   
     def get(self,request):
         carts=Cart.objects.filter(user=self.request.user)
         serializer=CartSerializer(carts,many=True)
@@ -316,3 +316,58 @@ class CartView(APIView):
         user = request.user
         Cart.objects.filter(user=user).delete()
         return Response({"message":"Items removed from cart"})
+
+
+class OrderView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self,request):
+        order=Order.objects.filter(user=self.request.user)
+        serializer=OrderSerializer(order,many=True)
+        return Response (serializer.data)
+    
+    def post(self,request):
+        cart_items = Cart.objects.filter(user=request.user)
+        order = Order.objects.create(user=request.user)
+        order_items=[]
+        total=0
+        for cart_item in cart_items:
+            order_item=OrderItem(
+                order=order,
+                
+                menuitem=cart_item.menuitem,
+                quantity=cart_item.quantity,
+                unit_price=cart_item.unit_price,
+                price=cart_item.price
+                )
+            order.save()
+            order_items.append(order_item)
+            total+=order_item.price
+        order.total=total
+        order.save()
+        
+        CartView.delete(self,request)
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class OrderDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,pk):
+        
+        order = get_object_or_404(Order, id=pk)
+        if order.user==request.user:
+            items = order.items.all()
+            order_item=OrderItem(
+                order=order.user,
+                
+                menuitem=items.menuitem,
+                quantity=items.quantity,
+                unit_price=order_item.unit_price,
+                price=order_item.price
+                )
+
+            serializer = OrderSerializer(order_item, many=True)
+            return Response(serializer.data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+        

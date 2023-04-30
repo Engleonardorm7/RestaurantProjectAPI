@@ -68,15 +68,16 @@ class Order(models.Model):
     user=models.ForeignKey(User, on_delete=models.CASCADE)
     delivery_crew=models.ForeignKey(User, on_delete=models.SET_NULL,related_name='delivery_crew',null=True)
     status=models.BooleanField(db_index=True,default=0)
-    total=models.DecimalField(max_digits=60, decimal_places=2, default=0)
-    date=models.DateField(db_index=True,default=timezone.now)
+    total=models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    date=models.DateField(db_index=True,auto_now_add=True)
+    # created_at = models.DateTimeField(auto_now_add=True)
 
 class OrderItem(models.Model):
-    order=models.ForeignKey(User, on_delete=models.CASCADE)
+    order=models.ForeignKey(Order, related_name='items',on_delete=models.CASCADE)
     menuitem=models.ForeignKey(MenuItem, on_delete=models.CASCADE,default=None)
     quantity = models.IntegerField(default=1)
-    unit_price=models.DecimalField(max_digits=6, decimal_places=2,default=None)
-    price=models.DecimalField(max_digits=6, decimal_places=2,default=None)
+    unit_price=models.DecimalField(max_digits=10, decimal_places=2,default=0.0)
+    price=models.DecimalField(max_digits=10, decimal_places=2,default=0.0)
 
     class Meta:
         unique_together=('order','menuitem')
