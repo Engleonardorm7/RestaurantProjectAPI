@@ -1,18 +1,14 @@
-from rest_framework import generics, status
-# from .models import CustomUser
-# from .serializers import CustomUserSerializer
+from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny, IsAuthenticated,BasePermission
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
 
 
-from rest_framework.permissions import IsAdminUser
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db.models import Q
 from .models import MenuItem, Cart,Order,OrderItem
-from .serializers import MenuItemSerializer,CartSerializer,OrderSerializer,OrderItemSerializer
+from .serializers import MenuItemSerializer,CartSerializer,OrderSerializer
 
 import decimal
 
@@ -25,6 +21,8 @@ import decimal
 class MenuItems(APIView):
     """
     API View to see, edit, create or delete items.
+
+    API endpoint: /api/menu-items/
 
     GET:
     Returns a list of all menu items.
@@ -140,15 +138,43 @@ class MenuItemDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def is_manager(self, user):
+        """
+        Checks if the user belongs to the Manager group.
+
+        Parameters:
+        user (User): The user to check.
+
+        Returns:
+        bool: True if the user belongs to the Manager group, False otherwise.
+        """
         return user.groups.filter(name='Manager').exists()
     
     def get(self, request, pk):
+        """
+        Retrieves a specific menu item.
+
+        Parameters:
+        request (Request): The HTTP request object.
+        pk (int): The ID of the menu item to retrieve.
+
+        Returns:
+        Response: A serialized representation of the menu item.
+        """
         item=get_object_or_404(MenuItem,pk=pk)
         serialized_item=MenuItemSerializer(item)
         return Response(serialized_item.data)
 
     def put(self, request, pk):
-        """Update a specific item with the provided data."""
+        """
+        Updates a specific menu item.
+
+        Parameters:
+        request (Request): The HTTP request object.
+        pk (int): The ID of the menu item to update.
+
+        Returns:
+        Response: A success message if the update was successful, an error message otherwise.
+        """
         if self.is_manager(self.request.user):
             item=get_object_or_404(MenuItem,pk=pk)
             serialized_item=MenuItemSerializer(item,data=request.data)
@@ -159,7 +185,16 @@ class MenuItemDetailView(APIView):
         return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
     def patch(self, request, pk):
-        """Partially update a specific item with the provided data."""
+        """
+        Partially updates a specific menu item.
+
+        Parameters:
+        request (Request): The HTTP request object.
+        pk (int): The ID of the menu item to partially update.
+
+        Returns:
+        Response: A success message if the update was successful, an error message otherwise.
+        """
         if self.is_manager(self.request.user):
             item=get_object_or_404(MenuItem,pk=pk)
             serialized_item=MenuItemSerializer(item, data=request.data, partial=True)
@@ -171,14 +206,14 @@ class MenuItemDetailView(APIView):
 
     def delete(self, request, pk):
         """
-        Deletes an existing menu item.
+        Deletes a specific menu item.
 
         Parameters:
         request (Request): The HTTP request object.
         pk (int): The ID of the menu item to delete.
 
         Returns:
-        Response: A response with a success message.
+        Response: A success message if the delete was successful, an error message otherwise.
         """
         if self.is_manager(self.request.user):
             item=get_object_or_404(MenuItem,pk=pk)
@@ -189,12 +224,22 @@ class MenuItemDetailView(APIView):
 
 class Managers(APIView):
 
+
     permission_classes = [IsAuthenticated]
 
     def is_manager(self, user):
         return user.groups.filter(name='Manager').exists()
     
     def get(self, request):
+        """
+        Retrieve a list of all the users belonging to the 'Manager' group.
+
+        Parameters:
+        request (Request): The HTTP request object.
+
+        Returns:
+        Response: A response with a list of all the users belonging to the 'Manager' group.
+        """
         if self.is_manager(self.request.user):
             managers = Group.objects.get(name='Manager') # Obtenemos el grupo Manager
             manager_users = managers.user_set.all() # Obtenemos todos los usuarios del grupo
@@ -203,6 +248,15 @@ class Managers(APIView):
         return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
     
     def post(self, request):
+        """
+        Add a user to the 'Manager' group.
+
+        Parameters:
+        request (Request): The HTTP request object.
+
+        Returns:
+        Response: A response indicating whether the operation was successful.
+        """
         if self.is_manager(self.request.user):
             username = request.data.get('username', None)
             if username:
@@ -216,6 +270,15 @@ class Managers(APIView):
 
 #Delete by username
     def delete(self,request):
+        """
+        Remove a user from the 'Manager' group.
+
+        Parameters:
+        request (Request): The HTTP request object.
+
+        Returns:
+        Response: A response indicating whether the operation was successful.
+        """
         if self.is_manager(self.request.user):
             username=request.data.get('username', None)
             if username:
@@ -243,6 +306,22 @@ class Managers(APIView):
 
 
 class DeliveryCrewView(APIView):
+    """
+    View to manage the Delivery crew user group.
+
+    Endpoint: groups/delivery-crew/users/
+
+    HTTP Methods:
+        - GET: Get a list of all the users in the Delivery crew group.
+        - POST: Add a user to the Delivery crew group.
+        
+    Returns:
+        - GET: Returns a list with the user information for all the users in the Delivery crew group.
+        - POST: Returns a message indicating that the user was added to the Delivery crew group.
+
+    Permission:
+        - IsAuthenticated: Users need to be authenticated to access this view.
+    """
     permission_classes = [IsAuthenticated]
 
     def is_manager(self,user):
@@ -269,6 +348,20 @@ class DeliveryCrewView(APIView):
 
 
 class DeleteDeliveryCrewView(APIView):
+    """
+    API view that handles DELETE requests to remove a user from the 'Delivery crew' group.
+
+    Endpoint: groups/delivery-crew/users/<int:pk>/
+    
+    Allowed HTTP methods: DELETE
+    
+    Attributes:
+    - permission_classes: List of permission classes that allow access to this view. Only authenticated users are allowed.
+    
+    Methods:
+    - is_manager(self, user): Method that checks if the authenticated user is a member of the 'Manager' group.
+    - delete(self, request, pk): Method that removes the user with the given pk from the 'Delivery crew' group.
+    """
     permission_classes = [IsAuthenticated]
 
     def is_manager(self,user):
@@ -287,6 +380,45 @@ class DeleteDeliveryCrewView(APIView):
 
 
 class CartView(APIView):
+    """
+    Endpoint: cart/menu-items
+
+    Class: CartView
+
+    This endpoint allows users to view and manage their shopping cart.
+
+    GET:
+    Returns all the items in the user's cart.
+    Request: GET /cart/menu-items/
+    Response:
+
+    200 OK: Returns a list of cart items with details of each item.
+    POST:
+    Adds an item to the user's cart.
+    Request: POST /cart/menu-items/
+    Body:
+    {
+    "product_id": <id of menu item>,
+    "quantity": <quantity of menu item>
+    }
+    Response:
+
+    201 CREATED: Returns details of the item added to the cart.
+    DELETE:
+    Removes all the items from the user's cart.
+    Request: DELETE /cart/menu-items/
+    Response:
+
+    200 OK: Returns a success message.
+    Permission Classes:
+
+    IsAuthenticated: User must be authenticated to perform any action.
+    Note:
+
+    To add an item to the cart, the user needs to provide the ID of the menu item and the quantity they want to order.
+    The price of the item is calculated based on the unit price and quantity provided by the user.
+    To remove a single item from the cart, the user can send a DELETE request to the URL /cart/menu-items/<id of the item>.
+    """
     permission_classes = [IsAuthenticated]
    
     def get(self,request):
@@ -318,6 +450,35 @@ class CartView(APIView):
 
 
 class OrderView(APIView):
+    """
+    Endpoint: orders
+
+    Class: OrderView
+
+    Description: This class-based view allows authenticated users to create, view, and delete their orders. Managers can view all orders, and delivery crew members can view and update orders assigned to them.
+
+    Methods:
+
+    is_manager(self, user): helper method that returns a boolean indicating whether the user is a member of the "Manager" group.
+    is_delivery(self, user): helper method that returns a boolean indicating whether the user is a member of the "Delivery crew" group.
+    GET:
+
+    Description: Retrieve a list of orders. Managers can view all orders, and delivery crew members can view orders assigned to them. Regular users can only view their own orders.
+    Parameters: None
+    Returns: A Response object with a list of serialized Order objects.
+    POST:
+
+    Description: Create a new order based on the items in the user's cart. Deletes the cart items after the order is created.
+    Parameters:
+    product_id: ID of the MenuItem object to be added to the order.
+    quantity: Quantity of the MenuItem to be added to the order.
+    Returns: A Response object with a serialized Order object.
+    DELETE:
+
+    Description: Delete all orders created by the user.
+    Parameters: None
+    Returns: A Response object with a success message.
+    """
     permission_classes = [IsAuthenticated]
 
     def is_manager(self, user):
@@ -396,13 +557,40 @@ class OrderDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def is_manager(self, user):
+        """
+        This method checks if the user belongs to the Manager group.
+
+        Parameters:
+        user (User): The user to be checked.
+
+        Returns:
+        bool: True if the user belongs to the Manager group, False otherwise.
+        """
         return user.groups.filter(name='Manager').exists()
     
     def is_delivery (self, user):
+        """
+        This method checks if the user belongs to the Delivery crew group.
+
+        Parameters:
+        user (User): The user to be checked.
+
+        Returns:
+        bool: True if the user belongs to the Delivery crew group, False otherwise.
+        """
         return user.groups.filter(name='Delivery crew').exists()
     
     def get(self,request,pk):
-        
+        """
+        This method returns all items for an order ID.
+
+        Parameters:
+        request (Request): The HTTP request object.
+        pk (int): The primary key of the order.
+
+        Returns:
+        Response: The HTTP response object.
+        """
         order = get_object_or_404(Order, pk=pk)
         if order.user == request.user:
             # Obtener todos los objetos de Elemento de Pedido para el pedido actual.
@@ -419,6 +607,16 @@ class OrderDetailView(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     def put(self,request,pk):
+        """
+        This method updates the status and delivery crew of an order.
+
+        Parameters:
+        request (Request): The HTTP request object.
+        pk (int): The primary key of the order.
+
+        Returns:
+        Response: The HTTP response object.
+        """
         order = get_object_or_404(Order, pk=pk)
         if self.is_manager(self.request.user):
             delivery_crew_id = request.data.get('delivery_crew')
@@ -438,6 +636,16 @@ class OrderDetailView(APIView):
 
 
     def patch(self,request,pk):
+        """
+        This method updates the status of an order.
+
+        Parameters:
+        request (Request): The HTTP request object.
+        pk (int): The primary key of the order.
+
+        Returns:
+        Response: The HTTP response object.
+        """
         order = get_object_or_404(Order, pk=pk)
         if self.is_manager(self.request.user):
             delivery_crew_id = request.data.get('delivery_crew')
@@ -459,6 +667,16 @@ class OrderDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         
     def delete(self,request,pk):
+        """
+        This method deletes an order.
+
+        Parameters:
+        request (Request): The HTTP request object.
+        pk (int): The primary key of the order.
+
+        Returns:
+        Response: The HTTP response object.
+        """
         if self.is_manager(self.request.user):
             order=get_object_or_404(Order,pk=pk)
             if order:
@@ -469,24 +687,4 @@ class OrderDetailView(APIView):
         return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
 
-    #     def put(self, request, pk):
-    #     """Update a specific item with the provided data."""
-    #     if self.is_manager(self.request.user):
-    #         item=get_object_or_404(MenuItem,pk=pk)
-    #         serialized_item=MenuItemSerializer(item,data=request.data)
-    #         serialized_item.is_valid(raise_exception=True)
-    #         serialized_item.save()
-    #         return Response({'mensaje':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
-
-    #     return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
-
-    # def patch(self, request, pk):
-    #     """Partially update a specific item with the provided data."""
-    #     if self.is_manager(self.request.user):
-    #         item=get_object_or_404(MenuItem,pk=pk)
-    #         serialized_item=MenuItemSerializer(item, data=request.data, partial=True)
-    #         serialized_item.is_valid(raise_exception=True)
-    #         serialized_item.save()
-    #         return Response({'mensage':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
-
-    #     return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
+  
