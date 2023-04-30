@@ -319,10 +319,18 @@ class CartView(APIView):
 
 class OrderView(APIView):
     permission_classes = [IsAuthenticated]
+
+    def is_manager(self, user):
+        return user.groups.filter(name='Manager').exists()
     
+        
     def get(self,request):
         order=Order.objects.filter(user=self.request.user)
         serializer=OrderSerializer(order,many=True)
+        if self.is_manager(self.request.user):
+            order=Order.objects.all()
+            serializer=OrderSerializer(order,many=True)
+            return Response (serializer.data)
         return Response (serializer.data)
     
     def post(self,request):
@@ -361,13 +369,22 @@ class OrderView(APIView):
         CartView.delete(self,request)
         serializer = OrderSerializer(order)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def delete(self,request):
+        user = request.user
+        Order.objects.filter(user=user).delete()
+        return Response({"message":"Items removed from the order"})
 
 class OrderDetailView(APIView):
+    
     """
     API endpoint that returns all items for an order ID. If the order ID doesn't belong to the current user, it displays an appropriate HTTP error status code.
     """
     permission_classes = [IsAuthenticated]
 
+    def is_manager(self, user):
+        return user.groups.filter(name='Manager').exists()
+    
     def get(self,request,pk):
         
         order = get_object_or_404(Order, pk=pk)
@@ -385,3 +402,64 @@ class OrderDetailView(APIView):
         # Si el usuario actual no es el dueño del pedido, devuelve un error 404
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    def put(self,request,pk):
+        order = get_object_or_404(Order, pk=pk)
+        if self.is_manager(self.request.user):
+            delivery_crew_id = request.data.get('delivery_crew')
+            oreder_status = request.data.get('status')
+            order.status = oreder_status
+            if delivery_crew_id:
+                delivery_crew = get_object_or_404(User, pk=delivery_crew_id)
+                order.delivery_crew = delivery_crew
+                order.save()
+            serializer = OrderSerializer(order)
+            #return Response({'mensaje':f'{delivery_crew}\'s Order Updated'}, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def patch(self,request,pk):
+        order = get_object_or_404(Order, pk=pk)
+        if self.is_manager(self.request.user):
+            delivery_crew_id = request.data.get('delivery_crew')
+            oreder_status = request.data.get('status')
+            order.status = oreder_status
+            if delivery_crew_id:
+                delivery_crew = get_object_or_404(User, pk=delivery_crew_id)
+                order.delivery_crew = delivery_crew
+                order.save()
+            serializer = OrderSerializer(order)
+            #return Response({'mensaje':f'{delivery_crew}\'s Order Updated'}, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+    def delete(self,request,pk):
+        if self.is_manager(self.request.user):
+            order=get_object_or_404(Order,pk=pk)
+            if order:
+
+                order.delete()
+                return Response({'message':f'order {order.id } deleted successfully'}, status=status.HTTP_200_OK)
+            return Response({'message':'The Order does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
+
+
+    #     def put(self, request, pk):
+    #     """Update a specific item with the provided data."""
+    #     if self.is_manager(self.request.user):
+    #         item=get_object_or_404(MenuItem,pk=pk)
+    #         serialized_item=MenuItemSerializer(item,data=request.data)
+    #         serialized_item.is_valid(raise_exception=True)
+    #         serialized_item.save()
+    #         return Response({'mensaje':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
+
+    #     return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
+
+    # def patch(self, request, pk):
+    #     """Partially update a specific item with the provided data."""
+    #     if self.is_manager(self.request.user):
+    #         item=get_object_or_404(MenuItem,pk=pk)
+    #         serialized_item=MenuItemSerializer(item, data=request.data, partial=True)
+    #         serialized_item.is_valid(raise_exception=True)
+    #         serialized_item.save()
+    #         return Response({'mensage':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
+
+    #     return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
