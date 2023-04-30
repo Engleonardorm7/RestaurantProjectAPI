@@ -323,16 +323,29 @@ class OrderView(APIView):
     def is_manager(self, user):
         return user.groups.filter(name='Manager').exists()
     
+    def is_delivery (self, user):
+        return user.groups.filter(name='Delivery crew').exists()
         
     def get(self,request):
-        order=Order.objects.filter(user=self.request.user)
-        serializer=OrderSerializer(order,many=True)
+        
         if self.is_manager(self.request.user):
             order=Order.objects.all()
             serializer=OrderSerializer(order,many=True)
             return Response (serializer.data)
+        elif self.is_delivery(self.request.user):
+            order=Order.objects.filter(delivery_crew=self.request.user)
+            serializer=OrderSerializer(order,many=True)
+            return Response(serializer.data)
+        else:
+            order=Order.objects.filter(user=self.request.user)
+            serializer=OrderSerializer(order,many=True)
         return Response (serializer.data)
     
+
+
+
+
+
     def post(self,request):
         cart_items = Cart.objects.filter(user=request.user)
         order = Order.objects.create(user=request.user)
@@ -385,6 +398,9 @@ class OrderDetailView(APIView):
     def is_manager(self, user):
         return user.groups.filter(name='Manager').exists()
     
+    def is_delivery (self, user):
+        return user.groups.filter(name='Delivery crew').exists()
+    
     def get(self,request,pk):
         
         order = get_object_or_404(Order, pk=pk)
@@ -410,11 +426,15 @@ class OrderDetailView(APIView):
             order.status = oreder_status
             if delivery_crew_id:
                 delivery_crew = get_object_or_404(User, pk=delivery_crew_id)
-                order.delivery_crew = delivery_crew
-                order.save()
-            serializer = OrderSerializer(order)
+                if self.is_delivery(delivery_crew):
+                    order.delivery_crew = delivery_crew
+                    order.save()
+                    serializer = OrderSerializer(order)
             #return Response({'mensaje':f'{delivery_crew}\'s Order Updated'}, status=status.HTTP_200_OK)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                return Response({'mensaje':f'The user is not in the delivery crew'}, status=status.HTTP_200_OK)
+
+        return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
 
     def patch(self,request,pk):
@@ -427,6 +447,13 @@ class OrderDetailView(APIView):
                 delivery_crew = get_object_or_404(User, pk=delivery_crew_id)
                 order.delivery_crew = delivery_crew
                 order.save()
+            serializer = OrderSerializer(order)
+            #return Response({'mensaje':f'{delivery_crew}\'s Order Updated'}, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if self.is_delivery(self.request.user):
+            oreder_status = request.data.get('status')
+            order.status = oreder_status
+            order.save()
             serializer = OrderSerializer(order)
             #return Response({'mensaje':f'{delivery_crew}\'s Order Updated'}, status=status.HTTP_200_OK)
             return Response(serializer.data, status=status.HTTP_200_OK)
