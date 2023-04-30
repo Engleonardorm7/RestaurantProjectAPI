@@ -328,6 +328,7 @@ class OrderView(APIView):
     def post(self,request):
         cart_items = Cart.objects.filter(user=request.user)
         order = Order.objects.create(user=request.user)
+        
         order_items=[]
         total=0
         for cart_item in cart_items:
@@ -339,34 +340,48 @@ class OrderView(APIView):
                 unit_price=cart_item.unit_price,
                 price=cart_item.price
                 )
+            # orderitemview=OrderItem.objects.create(order=order_item.order,menuitem=order_item.menuitem)
             order.save()
             order_items.append(order_item)
             total+=order_item.price
-        order.total=total
-        order.save()
-        
+            order.total=total
+            
+            orderitemview=OrderItem.objects.create(
+            order=order,
+            menuitem=order_item.menuitem,
+            quantity=order_item.quantity,
+            unit_price=order_item.unit_price,
+            price=order_item.price,
+            )
+            orderitemview.save()
+
+
+
+        order.save()       
         CartView.delete(self,request)
         serializer = OrderSerializer(order)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class OrderDetailView(APIView):
+    """
+    API endpoint that returns all items for an order ID. If the order ID doesn't belong to the current user, it displays an appropriate HTTP error status code.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self,request,pk):
         
-        order = get_object_or_404(Order, id=pk)
-        if order.user==request.user:
-            items = order.items.all()
-            order_item=OrderItem(
-                order=order.user,
-                
-                menuitem=items.menuitem,
-                quantity=items.quantity,
-                unit_price=order_item.unit_price,
-                price=order_item.price
-                )
-
-            serializer = OrderSerializer(order_item, many=True)
-            return Response(serializer.data)
+        order = get_object_or_404(Order, pk=pk)
+        if order.user == request.user:
+            # Obtener todos los objetos de Elemento de Pedido para el pedido actual.
+            order_items = OrderItem.objects.filter(order=order)
+            # Crea una lista vacía para almacenar los objetos MenuItem serializados
+            menu_items = []
+            # Itera a través de los objetos OrderItem y serializa los objetos MenuItem correspondientes
+            for item in order_items:
+                serializer = MenuItemSerializer(item.menuitem)
+                menu_items.append(serializer.data)
+            # Devuelve la respuesta con la lista de objetos MenuItem serializados
+            return Response(menu_items, status=status.HTTP_200_OK)
+        # Si el usuario actual no es el dueño del pedido, devuelve un error 404
         return Response(status=status.HTTP_404_NOT_FOUND)
-        
+
