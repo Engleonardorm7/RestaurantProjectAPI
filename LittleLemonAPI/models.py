@@ -32,12 +32,7 @@ from django.utils import timezone
 #         return Response({'message': 'error'}, status=status.HTTP_400_BAD_REQUEST)
 
 class Category(models.Model):
-<<<<<<< HEAD
-    slug=models.SlugField()
-    title=models.CharField(("Title"), max_length=255, db_index=True)
-=======
     title=models.CharField(("Title"), max_length=100,unique=True, db_index=True)
->>>>>>> 9dca2ad
     
     def __str__(self):
         return self.title
@@ -48,42 +43,6 @@ class MenuItem(models.Model):
     Model class for the product.
     """
     title=models.CharField(("Title"), max_length=255)
-<<<<<<< HEAD
-    description=models.CharField(("Description"), max_length=255)
-    price=models.DecimalField(("Price"), max_digits=8, decimal_places=2)
-    image=models.ImageField(("image"), upload_to='LittleLemon/images', height_field=None, width_field=None, max_length=None)
-    inventory=models.SmallIntegerField(("Inventory"))
-    featured=models.BooleanField(db_index=True)
-    category=models.ForeignKey(Category, on_delete=models.PROTECT, default=1)
-
-class Cart(models.Model):
-    user=models.ForeignKey(User,on_delete=models.CASCADE)
-    menuitem=models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity=models.SmallIntegerField(),
-    unit_price=models.DecimalField(max_digits=6, decimal_places=2)
-    price=models.DecimalField( max_digits=6, decimal_places=2)
-     
-    class Meta:
-        unique_together=('menuitem','user')
-
-
-class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    delivery_crew = models.ForeignKey(User, on_delete=models.SET_NULL,related_name='delivery_crew', null=True)
-    status=models.BooleanField(db_index=True,default=0)
-    total=models.DecimalField(max_digits=6, decimal_places=2)
-    date=models.DateField(db_index=True)
-
-class OrderItem(models.Model):
-    order=models.ForeignKey(User, on_delete=models.CASCADE)
-    menuitem=models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity=models.SmallIntegerField()
-    unit_price=models.DecimalField(max_digits=6, decimal_places=2)
-    price=models.DecimalField(max_digits=6, decimal_places=2)
-    
-    class Meta:
-        unique_together=('order','menuitem')
-=======
     price=models.DecimalField(("Price"), max_digits=10, decimal_places=2)
     featured=models.BooleanField(db_index=True)
     category=models.ForeignKey(Category, on_delete=models.PROTECT)
@@ -144,4 +103,3 @@ class OrderItem(models.Model):
 #     def save(self, *args, **kwargs):
 #         self.price = self.product.price * self.quantity
 #         super().save(*args, **kwargs)
->>>>>>> 9dca2ad

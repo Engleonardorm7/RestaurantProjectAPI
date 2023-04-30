@@ -11,13 +11,8 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db.models import Q
-<<<<<<< HEAD
-from .models import Product, Cart
-from .serializers import ProductSerializer,CartSerializer,OrderSerializer,OrderItemSerializer
-=======
 from .models import MenuItem, Cart,Order,OrderItem
 from .serializers import MenuItemSerializer,CartSerializer,OrderSerializer,OrderItemSerializer
->>>>>>> 9dca2ad
 
 import decimal
 
@@ -293,44 +288,6 @@ class DeleteDeliveryCrewView(APIView):
 
 class CartView(APIView):
     permission_classes = [IsAuthenticated]
-<<<<<<< HEAD
-    """
-        API endpoint that allows customers to get, add or delete menu items from their cart.
-    """
-    serializer_class = CartSerializer
-    def get(self, request):
-        user=request.user
-        cart_items=Cart.objects.filter(user=user)
-        serializer=self.serializer_class(cart_items,many=True)
-        return Response(serializer.data)
-    
-    def post(self, request):
-        pass
-
-    def delete(self, request):
-        pass
-
-
-# def post(self, request, *args, **kwargs):
-#         user = request.user
-#         menuitem_id = request.data.get('menuitem_id')
-#         quantity = request.data.get('quantity')
-
-#         # Create cart item
-#         try:
-#             cart_item = Cart.objects.create(user=user, menuitem_id=menuitem_id, quantity=quantity)
-#         except Exception as e:
-#             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-#         serializer = self.serializer_class(cart_item)
-#         return Response(serializer.data)
-
-#     def delete(self, request, *args, **kwargs):
-#         user = request.user
-#         Cart.objects.filter(user=user).delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-    
-=======
    
     def get(self,request):
         carts=Cart.objects.filter(user=self.request.user)
@@ -413,4 +370,3 @@ class OrderDetailView(APIView):
             return Response(serializer.data)
         return Response(status=status.HTTP_404_NOT_FOUND)
         
->>>>>>> 9dca2ad

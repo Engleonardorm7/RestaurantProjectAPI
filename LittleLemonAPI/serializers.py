@@ -1,9 +1,5 @@
 from rest_framework import serializers
-<<<<<<< HEAD
-from .models import  Category, OrderItem, Order, Product, User, Cart #CustomUser,
-=======
 from .models import  Category, Cart, Order, MenuItem, OrderItem #CustomUser,
->>>>>>> 9dca2ad
 
 # class CustomUserSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -23,30 +19,9 @@ class MenuItemSerializer(serializers.ModelSerializer):
         model=MenuItem
         fields=['id','title','price','featured','category']
 
-<<<<<<< HEAD
-class CartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cart
-        fields = ['id', 'user', 'menuitem','quantity', 'unit_price', 'price']
-
-
-
-class OrderSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model=Order
-        fields = ['id', 'user', 'delivery_crew', 'status', 'total', 'date']
-
-class OrderItemSerializer(serializers.ModelSerializer):
-=======
->>>>>>> 9dca2ad
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
-<<<<<<< HEAD
-        model=OrderItem
-        fields = ['id', 'order', 'menuitem', 'quantity', 'unit_price', 'price']
-=======
         model = Cart
         fields = ['id', 'user', 'menuitem', 'quantity', 'unit_price', 'price']
 
@@ -80,4 +55,3 @@ class OrderItemSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = User
 #         fields = ('id', 'username', 'email')
->>>>>>> 9dca2ad
