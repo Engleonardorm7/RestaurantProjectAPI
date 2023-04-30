@@ -11,42 +11,15 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from django.db.models import Q
+<<<<<<< HEAD
 from .models import Product, Cart
 from .serializers import ProductSerializer,CartSerializer,OrderSerializer,OrderItemSerializer
+=======
+from .models import MenuItem, Cart,Order,OrderItem
+from .serializers import MenuItemSerializer,CartSerializer,OrderSerializer,OrderItemSerializer
+>>>>>>> 9dca2ad
 
-from django.contrib.auth.decorators import user_passes_test
-
-
-# class CustomUserListCreateView(generics.ListCreateAPIView):
-#     """
-#     API View to create a user.
-#     """
-#     queryset = CustomUser.objects.all()
-#     serializer_class = CustomUserSerializer
-#     permission_classes = (AllowAny,)
-
-#     def post(self, request):
-#         serializer = self.get_serializer(data=request.data)
-#         if serializer.is_valid():
-#             username = serializer.validated_data.get('username')
-#             email = serializer.validated_data.get('email')
-#             if not CustomUser.objects.filter(Q(username=username) | Q(email=email)).exists():
-#                 serializer.save()
-#                 return Response({'message': f'User {username} created successfully.'}, status=status.HTTP_201_CREATED)
-#             else:
-#                 return Response({'error': 'User with that username or email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-# class UserDetailsView(APIView):
-#     """
-#     API view to see the current user or the list of users
-#     """
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         serializer = CustomUserSerializer(request.user)
-#         return Response(serializer.data)
+import decimal
 
 #-----------------------------------Product----------------
 
@@ -94,8 +67,8 @@ class MenuItems(APIView):
         Returns:
         Response: A response with serialized menu items.
         """
-        menu_items = Product.objects.all()
-        serializer = ProductSerializer(menu_items, many=True)
+        menu_items = MenuItem.objects.all()
+        serializer = MenuItemSerializer(menu_items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -109,16 +82,16 @@ class MenuItems(APIView):
         Response: A response with the created menu item data.
         """
         if self.is_manager(self.request.user):
-            serialized_item=ProductSerializer(data=request.data)
+            serialized_item=MenuItemSerializer(data=request.data)
             serialized_item.is_valid(raise_exception=True)
             serialized_item.save()
-            return Response({'mensaje': f'Product {ProductSerializer.fields__title} Created'},status=status.HTTP_201_CREATED)
+            return Response({'mensaje': f'Product {MenuItemSerializer.fields__title} Created'},status=status.HTTP_201_CREATED)
         return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
 
     def put(self, request, pk):
         if self.is_manager(self.request.user):
             item=self.get_object(pk)
-            serialized_item=ProductSerializer(item,data=request.data)
+            serialized_item=MenuItemSerializer(item,data=request.data)
             serialized_item.is_valid(raise_exception=True)
             serialized_item.save()
             return Response({'mensaje':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
@@ -128,7 +101,7 @@ class MenuItems(APIView):
     def patch(self, request, pk):
         if self.is_manager(self.request.user):
             item=self.get_object(pk)
-            serialized_item=ProductSerializer(item, data=request.data, partial=True)
+            serialized_item=MenuItemSerializer(item, data=request.data, partial=True)
             serialized_item.is_valid(raise_exception=True)
             serialized_item.save()
             return Response({'mensage':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
@@ -175,15 +148,15 @@ class MenuItemDetailView(APIView):
         return user.groups.filter(name='Manager').exists()
     
     def get(self, request, pk):
-        item=get_object_or_404(Product,pk=pk)
-        serialized_item=ProductSerializer(item)
+        item=get_object_or_404(MenuItem,pk=pk)
+        serialized_item=MenuItemSerializer(item)
         return Response(serialized_item.data)
 
     def put(self, request, pk):
         """Update a specific item with the provided data."""
         if self.is_manager(self.request.user):
-            item=get_object_or_404(Product,pk=pk)
-            serialized_item=ProductSerializer(item,data=request.data)
+            item=get_object_or_404(MenuItem,pk=pk)
+            serialized_item=MenuItemSerializer(item,data=request.data)
             serialized_item.is_valid(raise_exception=True)
             serialized_item.save()
             return Response({'mensaje':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
@@ -193,8 +166,8 @@ class MenuItemDetailView(APIView):
     def patch(self, request, pk):
         """Partially update a specific item with the provided data."""
         if self.is_manager(self.request.user):
-            item=get_object_or_404(Product,pk=pk)
-            serialized_item=ProductSerializer(item, data=request.data, partial=True)
+            item=get_object_or_404(MenuItem,pk=pk)
+            serialized_item=MenuItemSerializer(item, data=request.data, partial=True)
             serialized_item.is_valid(raise_exception=True)
             serialized_item.save()
             return Response({'mensage':f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
@@ -213,7 +186,7 @@ class MenuItemDetailView(APIView):
         Response: A response with a success message.
         """
         if self.is_manager(self.request.user):
-            item=get_object_or_404(Product,pk=pk)
+            item=get_object_or_404(MenuItem,pk=pk)
             item.delete()
             return Response({'mensaje': f'Product {item.title} Updated'}, status=status.HTTP_200_OK)
         return Response({'mensaje': 'Access Denied'},status=status.HTTP_403_FORBIDDEN)
@@ -320,6 +293,7 @@ class DeleteDeliveryCrewView(APIView):
 
 class CartView(APIView):
     permission_classes = [IsAuthenticated]
+<<<<<<< HEAD
     """
         API endpoint that allows customers to get, add or delete menu items from their cart.
     """
@@ -356,3 +330,87 @@ class CartView(APIView):
 #         Cart.objects.filter(user=user).delete()
 #         return Response(status=status.HTTP_204_NO_CONTENT)
     
+=======
+   
+    def get(self,request):
+        carts=Cart.objects.filter(user=self.request.user)
+        serializer=CartSerializer(carts,many=True)
+        return Response (serializer.data)
+
+    def post(self,request):
+        user = request.user
+        menuitem_id = request.data.get('product_id')
+        quantity = request.data.get('quantity')
+        menuitem = get_object_or_404(MenuItem, id=menuitem_id)
+        unit_price = menuitem.price
+        price = unit_price * decimal.Decimal(quantity)
+        cart_item = Cart.objects.create(
+            user=user,
+            menuitem=menuitem,
+            quantity=quantity,
+            unit_price=unit_price,
+            price=price
+        )
+        serializer = CartSerializer(cart_item)
+        return Response(serializer.data, status=201)
+
+    def delete(self,request):
+        user = request.user
+        Cart.objects.filter(user=user).delete()
+        return Response({"message":"Items removed from cart"})
+
+
+class OrderView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self,request):
+        order=Order.objects.filter(user=self.request.user)
+        serializer=OrderSerializer(order,many=True)
+        return Response (serializer.data)
+    
+    def post(self,request):
+        cart_items = Cart.objects.filter(user=request.user)
+        order = Order.objects.create(user=request.user)
+        order_items=[]
+        total=0
+        for cart_item in cart_items:
+            order_item=OrderItem(
+                order=order,
+                
+                menuitem=cart_item.menuitem,
+                quantity=cart_item.quantity,
+                unit_price=cart_item.unit_price,
+                price=cart_item.price
+                )
+            order.save()
+            order_items.append(order_item)
+            total+=order_item.price
+        order.total=total
+        order.save()
+        
+        CartView.delete(self,request)
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class OrderDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,pk):
+        
+        order = get_object_or_404(Order, id=pk)
+        if order.user==request.user:
+            items = order.items.all()
+            order_item=OrderItem(
+                order=order.user,
+                
+                menuitem=items.menuitem,
+                quantity=items.quantity,
+                unit_price=order_item.unit_price,
+                price=order_item.price
+                )
+
+            serializer = OrderSerializer(order_item, many=True)
+            return Response(serializer.data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+        
+>>>>>>> 9dca2ad
