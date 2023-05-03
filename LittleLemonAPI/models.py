@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 
+
 class Category(models.Model):
     title=models.CharField(("Title"), max_length=100,unique=True, db_index=True)
     

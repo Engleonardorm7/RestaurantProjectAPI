@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import  Category, Cart, Order, MenuItem, OrderItem #CustomUser,
 
+
 # class CustomUserSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model=CustomUser

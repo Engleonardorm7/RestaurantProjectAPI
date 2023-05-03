@@ -132,6 +132,16 @@ DJOSER = {
     "USER_ID_FIELD":"username",
 }
 
+# DJOSER = {
+#     'SERIALIZERS': {
+#         'user_create': 'LittleLemonAPI.serializers.CustomUserCreateSerializer',
+#     },
+#     'VIEW_CLASSES': {
+#         'registration': 'LittleLemonAPI.views.CustomRegistrationView',
+#     }
+# }
+
+
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
@@ -159,3 +169,6 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle'
         ],
 }
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)

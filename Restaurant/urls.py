@@ -18,11 +18,20 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.authtoken.views import obtain_auth_token
 
+from djoser.views import (
+    UserCreateView,
+    TokenCreateView,
+)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/',include('LittleLemonAPI.urls')),
     path('token/login/', obtain_auth_token, name='token-create'),
+
+    path('auth/register/', UserCreateView.as_view(), name='register'),
+    path('auth/token/', TokenCreateView.as_view(), name='token_obtain_pair'),
+
     
     
 ]

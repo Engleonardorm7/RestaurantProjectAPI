@@ -12,6 +12,8 @@ from .serializers import MenuItemSerializer,CartSerializer,OrderSerializer
 
 import decimal
 
+
+
 #-----------------------------------Product----------------
 
 #La principal diferencia entre ListCreateAPIView y ListAPIView es que ListCreateAPIView proporciona la funcionalidad para crear nuevos objetos utilizando el método POST, además de obtener una lista de objetos utilizando el método GET, mientras que ListAPIView solo se utiliza para obtener una lista de recursos utilizando el método GET.
