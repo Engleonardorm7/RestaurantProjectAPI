@@ -12,11 +12,34 @@ from .serializers import MenuItemSerializer,CartSerializer,OrderSerializer
 
 import decimal
 
+
+from .serializers import CreateUserSerializer
+
 #prueba
 #prueba2
+
+class CreateUserView(APIView):
+    serializer_class = CreateUserSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            user = serializer.save()
+            # aquí va la lógica para retornar la respuesta
+            return Response(serializer.to_representation(user))
+        else:
+            # aquí va la lógica para retornar los errores de validación
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
+
+
+
 #-----------------------------------Product----------------
 
 #La principal diferencia entre ListCreateAPIView y ListAPIView es que ListCreateAPIView proporciona la funcionalidad para crear nuevos objetos utilizando el método POST, además de obtener una lista de objetos utilizando el método GET, mientras que ListAPIView solo se utiliza para obtener una lista de recursos utilizando el método GET.
+
 
 
 

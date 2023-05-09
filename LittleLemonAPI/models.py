@@ -3,6 +3,12 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 
+# class User(models.Model):
+#     email = models.EmailField(max_length=254)
+#     username = models.CharField(max_length=255)
+#     password = models.CharField(max_length=50)
+#     # id = models.AutoField(primary_key=True)
+
 
 class Category(models.Model):
     title=models.CharField(("Title"), max_length=100,unique=True, db_index=True)

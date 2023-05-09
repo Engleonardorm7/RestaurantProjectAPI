@@ -2,6 +2,26 @@ from rest_framework import serializers
 from .models import  Category, Cart, Order, MenuItem, OrderItem #CustomUser,
 
 
+from django.contrib.auth.models import User
+
+class CreateUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password')
+
+    def create(self, validated_data):
+        return User.objects.create(**validated_data)
+    
+    def to_representation(self, instance):
+        # convertir el objeto User en un diccionario que se pueda serializar
+        return {
+            'id': instance.id,
+            'username': instance.username,
+            'email': instance.email
+        }
+
 # class CustomUserSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model=CustomUser
