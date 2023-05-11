@@ -36,41 +36,7 @@ class CreateUserView(APIView):
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     
-#---------------------------Crear login
-
-# class MyTokenObtainPairView(TokenObtainPairView):
-#     serializer_class = MyTokenObtainPairSerializer
-
-# class MyLoginView(LoginView):
-#     token_obtain_pair_serializer_class = MyTokenObtainPairView
-
-#     def get_token(self, user):
-#         # Genera un token de autenticación JWT utilizando la vista personalizada MyTokenObtainPairView
-#         token_serializer = self.token_obtain_pair_serializer_class.as_view()(request=self.request)
-#         token = token_serializer.post(request=self.request.data).data['access']
-#         return token
-
-#     def post(self, request, *args, **kwargs):
-#         # Usa el serializador personalizado para validar el cuerpo de solicitud y obtener los datos de usuario
-#         serializer = self.get_serializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         user = serializer.validated_data['username']
-
-#         # Realiza cualquier acción adicional antes de generar el token de autenticación, como verificar si el usuario está activo o realizar un registro de acceso
-
-#         token = self.get_token(user)
-
-#         # Construye la respuesta
-#         response_data = {
-#             'token': str(token),
-#             'user_id': user.id,
-#             'email': user.email
-#         }
-#         return Response(response_data, status=status.HTTP_200_OK)
-
-
-
-    
+  
 
 
 #-----------------------------------Product----------------

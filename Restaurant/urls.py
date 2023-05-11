@@ -20,7 +20,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 
 from LittleLemonAPI.views import CreateUserView
-from LittleLemonAPI.views import MyLoginView
+# from LittleLemonAPI.views import MyLoginView
 
 
 urlpatterns = [
@@ -28,7 +28,7 @@ urlpatterns = [
     path('api/',include('LittleLemonAPI.urls')),
     path('token/login/', obtain_auth_token, name='token-create'),
     path('auth/register/', CreateUserView.as_view(), name='register'),
-    path('login/', MyLoginView.as_view(), name='login'),
+    # path('login/', MyLoginView.as_view(), name='login'),
 
     #path('auth/token/', TokenCreateView.as_view(), name='token_obtain_pair'),
 

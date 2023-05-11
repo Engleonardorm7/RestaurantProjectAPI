@@ -5,22 +5,22 @@ from .models import  Category, Cart, Order, MenuItem, OrderItem #CustomUser,
 from django.contrib.auth.models import User
 
 
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework import serializers
+# from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+# from rest_framework import serializers
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """
-    Esta es una subclase personalizada del serializador TokenObtainPairSerializer.
-    """
-    # agrega información adicional en la respuesta del token si se necesita
-    user_id = serializers.IntegerField(source='user.id')
-    email = serializers.EmailField(source='user.email')
+# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+#     """
+#     Esta es una subclase personalizada del serializador TokenObtainPairSerializer.
+#     """
+#     # agrega información adicional en la respuesta del token si se necesita
+#     user_id = serializers.IntegerField(source='user.id')
+#     email = serializers.EmailField(source='user.email')
 
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        data['user_id'] = self.user.id
-        data['email'] = self.user.email
-        return data
+#     def validate(self, attrs):
+#         data = super().validate(attrs)
+#         data['user_id'] = self.user.id
+#         data['email'] = self.user.email
+#         return data
 
 
 
