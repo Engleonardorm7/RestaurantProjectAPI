@@ -17,6 +17,7 @@ import decimal
 #prueba4
 #prueba5=authview ready
 #prueba6
+#prueba7
 
 #-----------------------------------Product----------------
 
